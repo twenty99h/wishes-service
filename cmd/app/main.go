@@ -1,20 +1,21 @@
 package main
 
 import (
-	"log"
-	"net/http"
+	"context"
 
-	"github.com/go-chi/chi/v5"
+	"github.com/rs/zerolog/log"
+	"github.com/twenty99h/wishes-service/config"
+	"github.com/twenty99h/wishes-service/internal/app"
 )
 
 func main() {
-	r := chi.NewRouter()
+	c, err := config.New()
+	if err != nil {
+		log.Fatal().Err(err).Msg("config.New")
+	}
+	ctx := context.Background()
 
-	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello from handler!"))
-	})
-
-	if err := http.ListenAndServe(":8080", r); err != nil {
-		log.Fatal("Error starting server:", err)
+	if err = app.Run(ctx, c); err != nil {
+		log.Fatal().Err(err).Msg("app.Run")
 	}
 }
